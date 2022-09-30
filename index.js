@@ -2,6 +2,7 @@ const express = require('express')
 const app = express()
 const env = require('dotenv')
 env.config()
+process.env.TZ
 const port = process.env.PORT || 5000
 const employeRoutes = require('./src/routes/employeRoutes.js')
 const authRoutes = require('./src/routes/authRoutes.js')
