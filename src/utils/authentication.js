@@ -13,7 +13,7 @@ const passwordCompare = async (plainText, encryptText) => {
 const generateToken = (username, loginTime) => {
   const secretKey = process.env.JWT_KEY || "SECRET";
   const token = jwt.sign({ username, loginTime }, secretKey, {
-    expiresIn: Math.floor(Date.now() / 1000) + 60 * 60,
+    expiresIn: '60m',
   });
   return token;
 };
