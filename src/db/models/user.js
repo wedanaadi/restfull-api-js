@@ -23,6 +23,10 @@ module.exports = (sequelize, DataTypes) => {
     username: DataTypes.STRING,
     fullname: DataTypes.STRING,
     password: DataTypes.STRING,
+    refreshToken: {
+      allowNull: true,
+      type: DataTypes.TEXT
+    },
     createdAt: {
       allowNull: false,
       type: DataTypes.STRING,

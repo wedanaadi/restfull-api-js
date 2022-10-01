@@ -10,10 +10,18 @@ const passwordCompare = async (plainText, encryptText) => {
   return result;
 };
 
-const generateToken = (username, loginTime) => {
+const generateToken = (username, loginTime, fullname) => {
   const secretKey = process.env.JWT_KEY || "SECRET";
-  const token = jwt.sign({ username, loginTime }, secretKey, {
-    expiresIn: '60m',
+  const token = jwt.sign({ username, loginTime, fullname }, secretKey, {
+    expiresIn: '30s',
+  });
+  return token;
+};
+
+const generateRefreshToken = (username, loginTime, fullname) => {
+  const secretKey = process.env.JWT_REFRESH || "SECRET";
+  const token = jwt.sign({ username, loginTime, fullname }, secretKey, {
+    expiresIn: '1d',
   });
   return token;
 };
@@ -22,4 +30,5 @@ module.exports = {
   passwordHash,
   passwordCompare,
   generateToken,
+  generateRefreshToken,
 };
