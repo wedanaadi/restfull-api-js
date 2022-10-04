@@ -20,11 +20,10 @@ const register = async (req, res) => {
       password: passHash,
     });
     res.status(201).json({
-      success: true,
       data: user,
     });
   } catch (error) {
-    res.status(422).json(error);
+    res.status(422).json({ errors: error });
   }
 };
 
@@ -36,11 +35,11 @@ const login = async (req, res) => {
     },
   });
   if (!user) {
-    return res.status(404).json("username not found");
+    return res.status(404).json({ errors: "username not found" });
   }
   const match = await passwordCompare(password, user.password);
   if (!match) {
-    return res.status(401).json("password wrong");
+    return res.status(401).json({ errors: "password wrong" });
   }
 
   const token = await generateToken(user.username, Date.now(), user.fullname);
@@ -65,9 +64,10 @@ const login = async (req, res) => {
   // });
 
   return res.status(200).json({
-    success: true,
-    token,
-    refreshToken
+    data: {
+      token,
+      refreshToken,
+    },
   });
 };
 
@@ -81,13 +81,10 @@ const logout = async (req, res) => {
     const userId = user.id;
     await User.update({ refreshToken: null }, { where: { id: userId } });
     // // res.clearCookie('refreshToken')
-    res.status(200).json({
-      success:true,
-      msg:"logout Successfuly!"
-    })
+    res.sendStatus(200);
   } catch (error) {
     console.log(error);
-    res.json({ msg: error }).status(422);
+    res.json({ errors: error }).status(422);
   }
 };
 
@@ -105,10 +102,14 @@ const refreshToken = async (req, res) => {
         Date.now(),
         user.fullname
       );
-      return res.status(200).json({ token: accessToken });
+      return res.status(200).json({
+        data: {
+          token: accessToken,
+        },
+      });
     });
   } catch (error) {
-    console.log(error);
+    return res.status(422).json({ errors: error });
   }
 };
 

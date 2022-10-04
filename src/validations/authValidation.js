@@ -19,7 +19,7 @@ const validationRegister = [
     .notEmpty()
     .withMessage("Username must be required")
     .custom((value) => checkUsername(value)),
-  check("password").notEmpty().withMessage("Password must be required"),
+  check("password").notEmpty().withMessage("Password must be required").isNumeric(),
   check("fullname").notEmpty().withMessage("Fullname must be required"),
 ];
 
