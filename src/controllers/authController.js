@@ -56,12 +56,12 @@ const login = async (req, res) => {
     }
   );
 
-  // res.cookie("refreshToken", refreshToken, {
-  //   httpOnly: true,
-  //   maxAge: 24 * 60 * 60 * 1000,
-  //   // secure: true,
-  //   sameSite: "none"
-  // });
+  res.cookie("refreshToken", refreshToken, {
+    httpOnly: true,
+    maxAge: 24 * 60 * 60 * 1000,
+    secure: true,
+    sameSite: "none"
+  });
 
   return res.status(200).json({
     data: {
@@ -73,15 +73,14 @@ const login = async (req, res) => {
 
 const logout = async (req, res) => {
   try {
-    const cookieToken = req.headers.refreshtoken;
-    const encrypt = atob(cookieToken);
+    const cookieToken = req.cookies.refreshToken;
     if (!cookieToken) return res.sendStatus(204);
-    const user = await User.findOne({ where: { refreshToken: encrypt } });
+    const user = await User.findOne({ where: { refreshToken: cookieToken } });
     if (!user) return res.sendStatus(204);
     const userId = user.id;
     await User.update({ refreshToken: null }, { where: { id: userId } });
-    // // res.clearCookie('refreshToken')
-    res.sendStatus(200);
+    res.clearCookie('refreshToken')
+    return res.sendStatus(200);
   } catch (error) {
     console.log(error);
     res.json({ errors: error }).status(422);
@@ -90,12 +89,11 @@ const logout = async (req, res) => {
 
 const refreshToken = async (req, res) => {
   try {
-    const cookieToken = req.headers.refreshtoken;
-    const encrypt = atob(cookieToken);
-    if (!cookieToken) return res.sendStatus(401);
-    const user = await User.findOne({ where: { refreshToken: encrypt } });
+    const cookieToken = req.cookies.refreshToken;
+    if(!cookieToken) return res.sendStatus(401);
+    const user = await User.findOne({ where: { refreshToken: cookieToken } });
     if (!user) return res.sendStatus(403);
-    await jwt.verify(encrypt, process.env.JWT_REFRESH, (err) => {
+    await jwt.verify(cookieToken, process.env.JWT_REFRESH, (err) => {
       if (err) return res.sendStatus(403);
       const accessToken = generateToken(
         user.username,
